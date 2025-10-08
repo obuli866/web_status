@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .progress-bar { transition: width 1s ease-in-out; }
+  </style>
+</head>
+<body class="bg-light">
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📊 Project Dashboard</h2>
+    <a href="{{ url_for('add_project') }}" class="btn btn-primary">➕ Add Project</a>
+  </div>
+ 
+  <div class="row">
+    {% for p in projects %}
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ p.name }}</h5>
+            <p><strong>ID:</strong> {{ p.id }}</p>
+            <p><strong>Developer:</strong> {{ p.developer }}</p>
+            <p><strong>Complexity:</strong> {{ p.complexity }}</p>
+            <p><strong>Estimation:</strong> {{ p.estimation }}</p>
+            <p><strong>Status:</strong> {{ p.status }}</p>
+            <p><strong>Start Date:</strong> {{ p.start_date }}</p>
+            <p><strong>End Date:</strong> {{ p.end_date }}</p>
+ 
+            {% set progress_list = [
+              {'label': 'Analysis', 'value': p.analysis_progress},
+              {'label': 'Dev', 'value': p.development_progress},
+              {'label': 'Test', 'value': p.testing_progress}
+            ] %}
+ 
+            {% for item in progress_list %}
+              {% if item.value >= 75 %}
+                {% set bar_class = 'bg-success' %}
+              {% elif item.value >= 50 %}
+                {% set bar_class = 'bg-warning' %}
+              {% else %}
+                {% set bar_class = 'bg-danger' %}
+              {% endif %}
+              <div class="progress mb-2">
+                <div class="progress-bar {{ bar_class }}" role="progressbar" style="width:0;"
+                     aria-valuenow="{{ item.value }}" aria-valuemin="0" aria-valuemax="100">
+                  {{ item.label }} {{ item.value }}%
+                </div>
+              </div>
+            {% endfor %}
+ 
+            <div class="d-flex justify-content-end mt-2">
+              <a href="{{ url_for('edit_project', project_id=p.id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p class="text-center text-muted">No projects yet. Click "Add Project" to begin.</p>
+    {% endfor %}
+  </div>
+</div>
+ 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('.progress-bar').forEach(bar => {
+    const value = bar.getAttribute('aria-valuenow');
+    bar.style.width = value + '%';
+  });
+});
+</script>
+</body>
+</html>
